@@ -1,5 +1,6 @@
 package tn.esprit.auth.configuration;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tn.esprit.auth.filter.JwtFilter;
 import tn.esprit.auth.services.CustomUserDetailsService;
@@ -33,11 +34,17 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1/login", "/api/v1/register").permitAll()
+                        auth
+                                .requestMatchers(
+                                        "/api/v1/login",
+                                        "/api/v1/register").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/user/**").permitAll()  // allow only GET publicly
+                                .requestMatchers(HttpMethod.DELETE, "/api/user/**").hasRole("ADMIN")  // secure DELETE
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtFilter(userDetailsService, jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -20,7 +20,6 @@ public class userController {
     public User createUser (@RequestBody User user) {
         return userService.saveUser(user);
     }
-
     @DeleteMapping("/deleteUser/{id}")
     public void deleteUser (@PathVariable long id) {
         userService.deleteUser(id);
